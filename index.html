@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Kaf Dağı Düellosu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Grenze+Gotisch:wght@500;700&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --zemin:#0e1829; --zemin-2:#15223a; --zemin-3:#1c2d4c; --cizgi:#2c3f63;
+  --metin:#ece3cc; --soluk:#9aa8c2;
+  --altin:#d6ae5c; --altin-acik:#f1d58f;
+  --kagit:#f2e8d2; --kagit-2:#e3d4b2; --murekkep:#241d14; --murekkep-soluk:#6b5d49;
+  --od:#c0402b; --su:#2c5fa6; --yel:#1f8f84; --yer:#9c6a26;
+  --display:'Grenze Gotisch', Georgia, 'Times New Roman', serif;
+  --govde:'Alegreya Sans', 'Segoe UI', system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--zemin); color:var(--metin);
+  background-image:radial-gradient(rgba(214,174,92,.07) 1px, transparent 1.6px);
+  background-size:26px 26px;
+  font-family:var(--govde); font-size:16px; line-height:1.45;
+}
+#app{max-width:1200px; margin:0 auto; padding-inline:16px; padding-block:18px 40px}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:2px solid var(--altin-acik); outline-offset:2px}
+
+.btn{font:inherit; font-weight:800; font-size:16px; border-radius:8px; padding:10px 20px; border:1px solid var(--altin); background:var(--altin); color:#1a1408; cursor:pointer; transition:background .15s}
+.btn:hover:not(:disabled){background:var(--altin-acik)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn.ikincil{background:transparent; color:var(--altin-acik)}
+.btn.ikincil:hover:not(:disabled){background:rgba(214,174,92,.12)}
+.btn.kucuk{padding:6px 12px; font-size:14px}
+
+/* Kilim bandı */
+.bant{height:10px; border-radius:2px;
+  background:
+    linear-gradient(135deg, var(--zemin) 25%, transparent 25%) -5px 0/10px 10px,
+    linear-gradient(225deg, var(--zemin) 25%, transparent 25%) -5px 0/10px 10px,
+    var(--od);}
+
+/* ---------- Kart ---------- */
+.kart{--b:var(--yer); width:158px; flex:0 0 auto; background:var(--kagit); color:var(--murekkep);
+  border-radius:10px; border:3px solid var(--b); padding:7px; display:flex; flex-direction:column; gap:6px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35); position:relative; transition:transform .18s, box-shadow .18s; font-size:13px}
+.kart[data-boy="od"]{--b:var(--od)}
+.kart[data-boy="su"]{--b:var(--su)}
+.kart[data-boy="yel"]{--b:var(--yel)}
+.kart[data-boy="yer"]{--b:var(--yer)}
+.kart.efsane{box-shadow:0 0 0 2px var(--altin), 0 6px 16px rgba(0,0,0,.35)}
+.kart.tik{cursor:pointer}
+.kart.tik:hover{transform:translateY(-5px)}
+.kart.secili{transform:translateY(-12px); box-shadow:0 0 0 3px var(--altin-acik), 0 14px 26px rgba(0,0,0,.55)}
+.kart.acil{animation:cevir .55s cubic-bezier(.2,.8,.3,1) both}
+.orta + .slot .kart.acil{animation-delay:.18s}
+@keyframes cevir{from{transform:perspective(600px) rotateY(95deg); opacity:.2} to{transform:perspective(600px) rotateY(0); opacity:1}}
+.k-bas{display:flex; justify-content:space-between; align-items:baseline; gap:4px}
+.k-bas h3{margin:0; font-family:var(--display); font-weight:700; font-size:19px; line-height:1.05}
+.nadir{color:var(--b); font-size:10px; letter-spacing:1px; white-space:nowrap}
+.k-amb{height:58px; border-radius:6px; background-color:var(--b);
+  background-image:radial-gradient(rgba(255,255,255,.2) 1px, transparent 1.5px); background-size:8px 8px;
+  display:flex; align-items:center; justify-content:center; position:relative; color:#fff8e8}
+.k-amb svg{width:34px; height:34px}
+.k-boy{position:absolute; left:6px; bottom:3px; font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:800}
+.k-tah{position:absolute; right:5px; top:5px; background:var(--murekkep); color:var(--altin-acik); font-weight:800; font-size:13px; padding:1px 7px; border-radius:10px; font-variant-numeric:tabular-nums}
+.k-yt{margin:0; font-size:11.5px; line-height:1.25; color:var(--murekkep-soluk); min-height:2.5em}
+.k-yt b{color:var(--murekkep)}
+.k-st{display:flex; flex-direction:column; gap:2px}
+.st{display:grid; grid-template-columns:76px 1fr 24px; align-items:center; gap:6px; font:inherit; font-size:12px; color:inherit;
+  background:none; border:0; padding:2px 4px; border-radius:4px; text-align:left; width:100%}
+button.st{cursor:pointer}
+button.st:hover{background:var(--kagit-2)}
+.st.vur, button.st.vur:hover{background:var(--murekkep); color:var(--kagit)}
+.st-bar{height:5px; background:rgba(36,29,20,.14); border-radius:3px; overflow:hidden}
+.st-bar i{display:block; height:100%; background:var(--b)}
+.st.vur .st-bar{background:rgba(255,255,255,.2)}
+.st.vur .st-bar i{background:var(--altin)}
+.st-v{text-align:right; font-weight:800; font-variant-numeric:tabular-nums}
+
+.arka{width:158px; height:246px; flex:0 0 auto; border-radius:10px; border:3px solid var(--altin); color:var(--altin);
+  display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px rgba(0,0,0,.35);
+  background:
+    repeating-linear-gradient(45deg, rgba(214,174,92,.13) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(-45deg, rgba(214,174,92,.13) 0 2px, transparent 2px 14px),
+    var(--zemin-3);}
+.arka svg{width:64px; height:64px; background:var(--zemin-3); border-radius:50%; padding:6px}
+.mini{width:22px; height:32px; border-radius:3px; border:1.5px solid var(--altin); flex:0 0 auto;
+  background:repeating-linear-gradient(45deg, rgba(214,174,92,.25) 0 1px, transparent 1px 5px), var(--zemin-3)}
+
+/* ---------- Giriş ---------- */
+.giris{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:36px; align-items:center; padding-block:28px 36px}
+.ust-yazi{margin:0 0 8px; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.18em; color:var(--altin)}
+.giris h1{font-family:var(--display); font-weight:700; font-size:clamp(46px, 8vw, 88px); line-height:.92; margin:0 0 18px; color:var(--altin-acik)}
+.hikaye{font-size:17.5px; max-width:58ch; margin:0 0 22px; color:var(--metin)}
+.hikaye em{color:var(--altin-acik); font-style:normal; font-weight:700}
+.modlar{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px}
+.mod{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--cizgi); background:var(--zemin-2); border-radius:10px; padding:12px; cursor:pointer}
+.mod:has(input:checked){border-color:var(--altin); background:var(--zemin-3)}
+.mod input{accent-color:var(--altin); margin-top:4px}
+.mod b{display:block}
+.mod small{color:var(--soluk); font-size:13.5px}
+.alanlar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px}
+.alan{display:flex; flex-direction:column; gap:4px; flex:1 1 180px}
+.alan label{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--soluk); font-weight:700}
+.alan input{font:inherit; background:var(--zemin-2); color:var(--metin); border:1px solid var(--cizgi); border-radius:8px; padding:9px 12px}
+.alan input:focus{border-color:var(--altin)}
+.yelpaze{display:flex; justify-content:center; padding-block:20px}
+.yelpaze .kart:nth-child(1){transform:rotate(-9deg) translateY(16px); margin-right:-44px}
+.yelpaze .kart:nth-child(2){z-index:2}
+.yelpaze .kart:nth-child(3){transform:rotate(9deg) translateY(16px); margin-left:-44px}
+
+.kurallar{display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr); gap:28px; border-top:1px solid var(--cizgi); padding-top:26px}
+.kurallar h2{font-family:var(--display); font-size:26px; margin:0 0 10px; color:var(--altin-acik); font-weight:700}
+.kurallar ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:8px; max-width:62ch}
+.kurallar ol li::marker{color:var(--altin); font-weight:800}
+.kurallar p{margin:0 0 10px; color:var(--soluk)}
+.dongu{display:flex; flex-direction:column; gap:8px; margin:0 0 14px; padding:0; list-style:none}
+.dongu li{display:flex; align-items:center; gap:8px; font-size:15px}
+.cip{display:inline-flex; align-items:center; gap:5px; padding:2px 9px 2px 6px; border-radius:20px; font-weight:800; font-size:13px; color:#fff8e8; background:var(--c)}
+.cip svg{width:14px; height:14px}
+.cip[data-boy="od"]{--c:var(--od)} .cip[data-boy="su"]{--c:var(--su)} .cip[data-boy="yel"]{--c:var(--yel)} .cip[data-boy="yer"]{--c:var(--yer)} .cip[data-boy="efsane"]{--c:#8a6a24}
+.ytler{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:15px}
+.ytler b{color:var(--altin-acik)}
+
+/* ---------- Oyun ---------- */
+.oyun{display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:20px; align-items:start}
+.masa{display:flex; flex-direction:column; gap:14px; min-width:0}
+.ust-bar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; background:var(--zemin-2); border:1px solid var(--cizgi); border-radius:10px; padding:10px 14px}
+.marka{font-family:var(--display); font-size:24px; color:var(--altin-acik); font-weight:700}
+.tur{color:var(--soluk); font-variant-numeric:tabular-nums}
+.tur b{color:var(--metin); font-size:18px}
+.arena{display:flex; align-items:center; gap:8px; border-left:4px solid var(--c); padding-left:10px; flex:1 1 220px}
+.arena[data-boy="od"]{--c:var(--od)} .arena[data-boy="su"]{--c:var(--su)} .arena[data-boy="yel"]{--c:var(--yel)} .arena[data-boy="yer"]{--c:var(--yer)} .arena[data-boy="efsane"]{--c:var(--altin)}
+.arena svg{width:20px; height:20px; color:var(--c); flex:0 0 auto}
+.arena div{display:flex; flex-direction:column; line-height:1.15}
+.arena b{font-size:15px}
+.arena small{color:var(--soluk); font-size:13px}
+.cikis{display:flex; gap:8px; align-items:center; margin-left:auto; font-size:14px; color:var(--soluk)}
+
+.serit{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px 16px}
+.serit-ad{display:flex; align-items:baseline; gap:10px}
+.serit-ad h2{margin:0; font-family:var(--display); font-weight:700; font-size:24px}
+.rozet{font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:800; padding:2px 8px; border-radius:10px; background:var(--zemin-3); color:var(--soluk)}
+.rozet.aktif{background:var(--altin); color:#1a1408}
+.sayilar{display:flex; gap:14px; flex-wrap:wrap; align-items:center; color:var(--soluk); font-size:14px; font-variant-numeric:tabular-nums}
+.sayilar b{color:var(--metin); font-size:16px}
+.sayilar .toplam b{color:var(--altin-acik); font-size:20px}
+.tilsimlar{letter-spacing:2px; color:var(--altin)}
+.tilsimlar .bos{color:var(--cizgi)}
+.minis{display:flex; gap:4px}
+
+.duello{display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:start; background:var(--zemin-2); border:1px solid var(--cizgi); border-radius:12px; padding:16px}
+.slot{display:flex; flex-direction:column; align-items:center; gap:10px; min-width:0}
+.slot-etiket{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--soluk); font-weight:700; text-align:center}
+.slot-bos{width:158px; height:246px; border:2px dashed var(--cizgi); border-radius:10px; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--soluk); padding:14px; font-size:14px}
+.orta{display:flex; flex-direction:column; align-items:center; justify-content:center; align-self:center; gap:2px; min-width:120px; text-align:center}
+.orta small{font-size:12px; text-transform:uppercase; letter-spacing:.16em; color:var(--soluk); font-weight:700}
+.orta b{font-family:var(--display); font-size:32px; color:var(--altin-acik); line-height:1.1}
+.orta span{color:var(--soluk); font-size:13px}
+.slot.kazandi .kart{box-shadow:0 0 0 3px var(--altin-acik), 0 0 34px rgba(241,213,143,.45)}
+.slot.kaybetti .kart{filter:saturate(.35) brightness(.78)}
+.dokum{width:158px; font-size:13px; border-collapse:collapse; font-variant-numeric:tabular-nums}
+.dokum td{padding:2px 0; vertical-align:top}
+.dokum td:last-child{text-align:right; font-weight:700; padding-left:8px; white-space:nowrap}
+.dokum .eksi td:last-child{color:#f08a74}
+.dokum .top td{border-top:1px solid var(--cizgi); padding-top:5px; font-size:18px; font-weight:800}
+.slot.kazandi .dokum .top td{color:var(--altin-acik)}
+.hukum{grid-column:1/-1; text-align:center; border-top:1px solid var(--cizgi); padding-top:12px}
+.hukum h3{margin:0; font-family:var(--display); font-size:28px; color:var(--altin-acik); font-weight:700}
+.hukum p{margin:4px auto 0; max-width:60ch; color:var(--metin)}
+.hukum .neden{color:var(--soluk); font-size:14px}
+
+.durum{margin:0; color:var(--metin); font-size:16px}
+.durum b{color:var(--altin-acik)}
+.el{display:flex; gap:12px; overflow-x:auto; padding:18px 4px 12px; scroll-snap-type:x proximity}
+.el > *{scroll-snap-align:start}
+.el-gizli{display:flex; align-items:center; gap:10px; color:var(--soluk); padding-block:6px; font-size:14px}
+
+.eylem{position:sticky; bottom:0; z-index:5; display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; justify-content:space-between;
+  background:var(--zemin-2); border:1px solid var(--cizgi); border-radius:10px; padding:12px 14px; padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+  box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.ozet{font-size:15px; color:var(--soluk)}
+.ozet b{color:var(--metin)}
+.dugmeler{display:flex; gap:10px; flex-wrap:wrap}
+.tilsim-btn[aria-pressed="true"]{background:var(--altin); color:#1a1408}
+
+.defter{background:var(--zemin-2); border:1px solid var(--cizgi); border-radius:12px; padding:14px; position:sticky; top:calc(12px + env(safe-area-inset-top, 0px))}
+.defter h2{margin:0 0 8px; font-family:var(--display); font-weight:700; font-size:22px; color:var(--altin-acik)}
+.defter ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:52vh; overflow:auto}
+.defter li{display:flex; flex-direction:column; gap:1px; font-size:14px; border-bottom:1px solid var(--cizgi); padding-bottom:8px; font-variant-numeric:tabular-nums}
+.defter li:last-child{border-bottom:0}
+.log-tur{font-size:11.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--soluk); font-weight:700}
+.log-not{color:var(--soluk); font-size:13px}
+.defter .bos{color:var(--soluk); font-size:14px; margin:0}
+.defter details{margin-top:12px; border-top:1px solid var(--cizgi); padding-top:10px; font-size:14px}
+.defter summary{cursor:pointer; font-weight:700; color:var(--altin-acik)}
+.defter details ul{padding-left:18px; margin:8px 0 0; display:flex; flex-direction:column; gap:5px; color:var(--soluk)}
+
+.perde{position:fixed; inset:0; z-index:20; background:rgba(8,13,24,.96); display:flex; align-items:center; justify-content:center; padding:16px}
+.perde.opak{background:var(--zemin)}
+.perde-kutu{max-width:460px; width:100%; text-align:center; background:var(--zemin-2); border:1px solid var(--altin); border-radius:14px; padding:30px 22px; display:flex; flex-direction:column; gap:14px; align-items:center}
+.perde-kutu h2{margin:0; font-family:var(--display); font-weight:700; font-size:34px; color:var(--altin-acik); line-height:1.05}
+.perde-kutu p{margin:0; color:var(--metin)}
+.perde-kutu .soluk{color:var(--soluk); font-size:14px}
+.perde-kutu .arka{width:90px; height:130px}
+.perde-kutu .arka svg{width:44px; height:44px}
+.skor{display:flex; gap:28px; justify-content:center; font-variant-numeric:tabular-nums}
+.skor div{display:flex; flex-direction:column}
+.skor b{font-size:36px; color:var(--altin-acik); font-family:var(--display)}
+.skor span{color:var(--soluk); font-size:14px}
+
+@media (max-width:940px){
+  .oyun{grid-template-columns:minmax(0,1fr)}
+  .defter{position:static}
+  .defter ol{max-height:none}
+}
+@media (max-width:820px){
+  .giris{grid-template-columns:minmax(0,1fr); gap:10px}
+  .kurallar{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .duello{grid-template-columns:1fr 1fr; padding:12px 8px; gap:12px 8px}
+  .orta{grid-column:1/-1; order:-1; flex-direction:row; gap:10px; min-width:0; flex-wrap:wrap}
+  .orta b{font-size:26px}
+  .modlar{grid-template-columns:minmax(0,1fr)}
+  .kart, .arka, .slot-bos, .dokum{width:148px}
+  .st{grid-template-columns:70px 1fr 22px; gap:4px}
+  .yelpaze .kart:nth-child(1){margin-right:-80px}
+  .yelpaze .kart:nth-child(3){margin-left:-80px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important}
+}
+</style>
+
+<div id="app" lang="tr"></div>
+
+<script>
+(() => {
+const STATS = [['guc','Güç'],['day','Dayanıklılık'],['hiz','Hız'],['buy','Büyü'],['zek','Zekâ']];
+const STAT_AD = Object.fromEntries(STATS);
+const BOYLAR = {
+  od:  {ad:'Od',  alt:'Ateş',   yener:'yel', fiil:'yakar'},
+  yel: {ad:'Yel', alt:'Rüzgâr', yener:'yer', fiil:'aşındırır'},
+  yer: {ad:'Yer', alt:'Toprak', yener:'su',  fiil:'set çeker'},
+  su:  {ad:'Su',  alt:'Su',     yener:'od',  fiil:'söndürür'}
+};
+const NADIR = {siradan:['Sıradan',1], nadir:['Nadir',2], efsane:['Efsane',3]};
+const YT = {
+  oncu:'Saldırırken +8',
+  pusu:'Savunurken +8',
+  lanet:'Rakibin toplamı −6',
+  kalkan:'Beraberlikte kazanır',
+  olumsuz:'Kaybetse de ele geçirilmez',
+  suru:'Elinde aynı boydan kart varsa +6',
+  av:'Rakip Efsane ise +12'
+};
+const YT_AD = {oncu:'Öncü', pusu:'Pusu', lanet:'Lanet', kalkan:'Kalkan', olumsuz:'Ölümsüz', suru:'Sürü', av:'Avcı'};
+
+// [id, ad, boy, nadirlik, [Güç, Dayanıklılık, Hız, Büyü, Zekâ], yetenek, yetenek adı]
+const HAM = [
+  ['evren','Evren','od','efsane',[94,82,44,72,58],'lanet','Kavurucu Nefes'],
+  ['alazhan','Alaz Han','od','nadir',[62,54,68,86,42],'oncu','Ateş Buyruğu'],
+  ['semender','Semender','od','nadir',[46,92,58,64,50],'olumsuz','Yanmaz Deri'],
+  ['kiziltay','Kızıl Tay','od','siradan',[52,44,90,34,48],'suru','Yılkı'],
+  ['odiyesi','Od İyesi','od','siradan',[38,50,60,78,46],'pusu','Ocak Bekçisi'],
+  ['albasti','Albastı','od','siradan',[50,46,66,52,60],'av','Kızıl Pençe'],
+  ['sahmeran','Şahmeran','su','efsane',[48,66,56,92,96],'pusu','Yılanların Şahı'],
+  ['suana','Su Ana','su','nadir',[44,70,52,84,62],'kalkan','Durgun Ayna'],
+  ['suaygiri','Su Aygırı','su','nadir',[70,62,84,40,54],'oncu','Dalga Hücumu'],
+  ['golperisi','Göl Perisi','su','siradan',[34,48,62,76,52],'suru','Kız Kardeşler'],
+  ['balikadam','Balık Adam','su','siradan',[56,60,54,42,58],'kalkan','Pul Zırh'],
+  ['denizkizi','Deniz Kızı','su','siradan',[40,44,70,70,48],'av','Büyülü Şarkı'],
+  ['zumruduanka','Zümrüdüanka','yel','efsane',[70,64,88,74,60],'oncu','Kaf Kanatları'],
+  ['tulpar','Tulpar','yel','nadir',[58,56,96,48,54],'suru','Kanatlı Yılkı'],
+  ['huma','Hüma Kuşu','yel','nadir',[42,50,78,80,62],'kalkan','Devlet Gölgesi'],
+  ['karakus','Kara Kuş','yel','siradan',[60,48,74,38,50],'av','Pike'],
+  ['yelana','Yel Ana','yel','siradan',[36,42,72,74,50],'pusu','Kasırga Gözü'],
+  ['akdogan','Ak Doğan','yel','siradan',[54,40,84,30,60],'oncu','Gökten Dalış'],
+  ['erlikhan','Erlik Han','yer','efsane',[80,78,46,90,60],'lanet','Yeraltı Laneti'],
+  ['tepegoz','Tepegöz','yer','nadir',[99,94,30,34,30],'olumsuz','Tunç Deri'],
+  ['bozkurt','Bozkurt','yer','nadir',[72,60,78,40,66],'suru','Kurt Sürüsü'],
+  ['karakoncolos','Karakoncolos','yer','siradan',[66,58,48,50,48],'pusu','Zemheri Gecesi'],
+  ['yelbegen','Yelbegen','yer','siradan',[86,72,34,44,30],'oncu','Dev Yumruğu'],
+  ['basat','Basat','yer','siradan',[60,56,58,36,68],'av','Tepegöz Avcısı']
+];
+const KARTLAR = HAM.map(([id,ad,boy,nadir,v,yt,ytAd]) => ({
+  id, ad, boy, nadir, yt, ytAd, s:{guc:v[0], day:v[1], hiz:v[2], buy:v[3], zek:v[4]}
+}));
+const K = Object.fromEntries(KARTLAR.map(k => [k.id, k]));
+const ORT = Object.fromEntries(STATS.map(([k]) => [k, KARTLAR.reduce((t,c) => t + c.s[k], 0) / KARTLAR.length]));
+
+const ARENALAR = [
+  {ad:'Erciyes Kraterleri', boy:'od', aciklama:'Od kartlarına +6'},
+  {ad:'Van Gölü Kıyısı', boy:'su', aciklama:'Su kartlarına +6'},
+  {ad:'Nemrut Doruğu', boy:'yel', aciklama:'Yel kartlarına +6'},
+  {ad:'Kapadokya Mağaraları', boy:'yer', aciklama:'Yer kartlarına +6'},
+  {ad:'Kaf Dağı Eteği', boy:'efsane', aciklama:'Efsane kartlara +6'}
+];
+
+const IKON = {
+  od:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c.6 3.2 4.8 5.6 4.8 10.4a4.8 4.8 0 0 1-9.6 0c0-2.2 1.1-3.7 2.4-4.8-.1 2 .8 3.4 2 3.6-.8-3 0-6.3.4-9.2z"/></svg>',
+  su:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7c2.5-2.5 5-2.5 7.5 0s5 2.5 7.5 0 3.5-1.5 5 0"/><path d="M2 12c2.5-2.5 5-2.5 7.5 0s5 2.5 7.5 0 3.5-1.5 5 0"/><path d="M2 17c2.5-2.5 5-2.5 7.5 0s5 2.5 7.5 0 3.5-1.5 5 0"/></svg>',
+  yel:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10a3 3 0 1 0-3-3"/><path d="M3 12h15a3 3 0 1 1-3 3"/><path d="M3 16h8"/></svg>',
+  yer:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M1 20 8.5 7l4.5 7.5 3-4.5L23 20z"/></svg>',
+  efsane:'<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="5" width="14" height="14"/><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="3"/></g></svg>'
+};
+
+const $app = document.getElementById('app');
+let S = null;
+let ui = {mod:'ai', cikis:false, odak:null};
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rast = a => a[Math.floor(Math.random() * a.length)];
+const karistir = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const toplamStat = k => STATS.reduce((t,[s]) => t + k.s[s], 0);
+const kartSay = o => o.el.length + o.deste.length;
+
+/* ---------- Kurallar motoru ---------- */
+function hesapla(kart, rakip, stat, rol, o, tilsim) {
+  const r = [[STAT_AD[stat], kart.s[stat]]];
+  if (rakip && BOYLAR[kart.boy].yener === rakip.boy)
+    r.push([`${BOYLAR[kart.boy].ad} ${BOYLAR[kart.boy].fiil} ${BOYLAR[rakip.boy].ad}`, 10]);
+  const a = S.arena;
+  if (a.boy === kart.boy || (a.boy === 'efsane' && kart.nadir === 'efsane')) r.push([`Arena`, 6]);
+  if (kart.yt === 'oncu' && rol === 'saldiri') r.push([kart.ytAd, 8]);
+  if (kart.yt === 'pusu' && rol === 'savunma') r.push([kart.ytAd, 8]);
+  if (kart.yt === 'suru' && o.el.some(x => x !== kart.id && K[x].boy === kart.boy)) r.push([kart.ytAd, 6]);
+  if (kart.yt === 'av' && rakip && rakip.nadir === 'efsane') r.push([kart.ytAd, 12]);
+  if (tilsim) r.push(['Tılsım', 15]);
+  if (rakip && rakip.yt === 'lanet') r.push([`${rakip.ad}: ${rakip.ytAd}`, -6]);
+  return {r, t: r.reduce((s, x) => s + x[1], 0)};
+}
+
+function yeniOyun(mod, ad1, ad2) {
+  const d = karistir(KARTLAR.map(k => k.id));
+  const oy = (ad, ai, ids) => ({ad, ai, el: ids.slice(0, 5), deste: ids.slice(5), tilsim: 2});
+  S = {
+    mod, tur: 0, maxTur: 16,
+    oyuncular: [oy(ad1, false, d.slice(0, 12)), oy(ad2, mod === 'ai', d.slice(12))],
+    saldiran: Math.random() < .5 ? 0 : 1,
+    arena: null, faz: '', sec: null, sav: null, sonuc: null, kapi: null, log: []
+  };
+  ui.cikis = false;
+  turBaslat(true);
+}
+
+function turBaslat(ilk) {
+  S.tur++;
+  if (!ilk) S.saldiran = 1 - S.saldiran;
+  S.arena = rast(ARENALAR);
+  S.sec = {kart: null, stat: null, tilsim: false};
+  S.sav = {kart: null, tilsim: false};
+  S.sonuc = null;
+  S.faz = 'saldiri';
+  if (S.oyuncular[S.saldiran].ai) { aiSaldir(); return; }
+  if (S.mod === 'pvp') S.kapi = S.saldiran;
+  ciz();
+}
+
+function saldiriOnayla() {
+  const sa = S.oyuncular[S.saldiran];
+  sa.el = sa.el.filter(id => id !== S.sec.kart);
+  if (S.sec.tilsim) sa.tilsim--;
+  S.faz = 'savunma';
+  const sv = S.oyuncular[1 - S.saldiran];
+  if (sv.ai) { aiSavun(); return; }
+  if (S.mod === 'pvp') S.kapi = 1 - S.saldiran;
+  ciz();
+}
+
+function savunmaOnayla() {
+  const sv = S.oyuncular[1 - S.saldiran];
+  sv.el = sv.el.filter(id => id !== S.sav.kart);
+  if (S.sav.tilsim) sv.tilsim--;
+  coz();
+  S.faz = 'acilis';
+  ciz();
+}
+
+function coz() {
+  const si = S.saldiran, vi = 1 - si;
+  const sa = S.oyuncular[si], sv = S.oyuncular[vi];
+  const ka = K[S.sec.kart], kv = K[S.sav.kart], st = S.sec.stat;
+  const A = hesapla(ka, kv, st, 'saldiri', sa, S.sec.tilsim);
+  const V = hesapla(kv, ka, st, 'savunma', sv, S.sav.tilsim);
+  let w = null, neden;
+  if (A.t !== V.t) { w = A.t > V.t ? si : vi; neden = `Toplam ${Math.max(A.t, V.t)} – ${Math.min(A.t, V.t)}`; }
+  else if ((ka.yt === 'kalkan') !== (kv.yt === 'kalkan')) { w = ka.yt === 'kalkan' ? si : vi; neden = `Toplamlar eşit (${A.t}). Kalkan yeteneği beraberliği bozdu.`; }
+  else if (ka.s.hiz !== kv.s.hiz) { w = ka.s.hiz > kv.s.hiz ? si : vi; neden = `Toplamlar eşit (${A.t}). Hızı yüksek olan kart kazandı.`; }
+  else neden = `Toplamlar ve hızlar eşit (${A.t}).`;
+
+  let not;
+  if (w === null) {
+    sa.deste.push(ka.id); sv.deste.push(kv.id);
+    not = 'Tam beraberlik. İki kart da sahibinin destesine döndü.';
+  } else {
+    const W = S.oyuncular[w], L = S.oyuncular[1 - w];
+    const kw = w === si ? ka : kv, kl = w === si ? kv : ka;
+    W.deste.push(kw.id);
+    const fark = kl.s.day - kw.s.guc;
+    if (kl.yt === 'olumsuz') { L.deste.push(kl.id); not = `${kl.ad}, ${kl.ytAd} sayesinde ele geçirilmedi ve sahibine döndü.`; }
+    else if (fark >= 20) { L.deste.push(kl.id); not = `${kl.ad} kaçtı: Dayanıklılık ${kl.s.day}, karşısındaki Güç ${kw.s.guc} (fark ${fark}).`; }
+    else { W.deste.push(kl.id); not = `${W.ad}, ${kl.ad} kartını ele geçirdi.`; }
+  }
+  S.sonuc = {stat: st, A, V, w, neden, not, ka: ka.id, kv: kv.id, ta: S.sec.tilsim, tv: S.sav.tilsim};
+  S.log.unshift({tur: S.tur, stat: STAT_AD[st], a: ka.ad, at: A.t, v: kv.ad, vt: V.t,
+    kazanan: w === null ? null : S.oyuncular[w].ad, not});
+}
+
+function sonrakiTur() {
+  S.oyuncular.forEach(o => { while (o.el.length < 5 && o.deste.length) o.el.push(o.deste.shift()); });
+  const say = S.oyuncular.map(kartSay);
+  if (say[0] === 0 || say[1] === 0 || S.tur >= S.maxTur) { S.faz = 'son'; ciz(); return; }
+  turBaslat(false);
+}
+
+/* ---------- Bilgisayar rakip (sadece kendi elini ve açık bilgiyi görür) ---------- */
+function aiSaldir() {
+  const o = S.oyuncular[S.saldiran];
+  let en = null;
+  for (const id of o.el) for (const [k] of STATS) {
+    const v = hesapla(K[id], null, k, 'saldiri', o, false).t;
+    const skor = v - ORT[k] - 0.04 * toplamStat(K[id]) + Math.random() * 3;
+    if (!en || skor > en.skor) en = {id, k, skor};
+  }
+  const tilsim = o.tilsim > 0 && en.skor < 14 && Math.random() < 0.45;
+  S.sec = {kart: en.id, stat: en.k, tilsim};
+  saldiriOnayla();
+}
+
+function aiSavun() {
+  const o = S.oyuncular[1 - S.saldiran], k = S.sec.stat;
+  const hedef = ORT[k] + 24;
+  const ad = o.el.map(id => ({id, v: hesapla(K[id], null, k, 'savunma', o, false).t, t: toplamStat(K[id])}));
+  let sec = ad.filter(a => a.v >= hedef).sort((a, b) => a.t - b.t)[0];
+  let tilsim = false;
+  if (!sec && o.tilsim > 0) {
+    const c = ad.filter(a => a.v + 15 >= hedef).sort((a, b) => b.v - a.v)[0];
+    if (c && Math.random() < 0.7) { sec = c; tilsim = true; }
+  }
+  if (!sec) sec = ad.sort((a, b) => a.t - b.t)[0];
+  S.sav = {kart: sec.id, tilsim};
+  savunmaOnayla();
+}
+
+/* ---------- Görünüm ---------- */
+function kartHTML(k, o = {}) {
+  const b = BOYLAR[k.boy];
+  const stats = STATS.map(([key, ad]) => {
+    const v = k.s[key], vur = o.vurgu === key;
+    const ic = `<span class="st-ad">${ad}</span><span class="st-bar"><i style="width:${v}%"></i></span><span class="st-v">${v}</span>`;
+    return o.statSec
+      ? `<button class="st${vur ? ' vur' : ''}" data-act="stat" data-id="${k.id}" data-stat="${key}" aria-pressed="${vur}" aria-label="${k.ad}: ${ad} ${v}">${ic}</button>`
+      : `<div class="st${vur ? ' vur' : ''}">${ic}</div>`;
+  }).join('');
+  const cls = ['kart', k.nadir, o.secili && 'secili', o.tik && 'tik', o.acil && 'acil'].filter(Boolean).join(' ');
+  const tik = o.tik ? ` data-act="kart" data-id="${k.id}" role="button" tabindex="0" aria-pressed="${!!o.secili}" aria-label="${k.ad}"` : '';
+  return `<article class="${cls}" data-boy="${k.boy}"${tik}>
+    <header class="k-bas"><h3>${k.ad}</h3><span class="nadir" title="${NADIR[k.nadir][0]}">${'◆'.repeat(NADIR[k.nadir][1])}</span></header>
+    <div class="k-amb">${IKON[k.boy]}<span class="k-boy">${b.ad} · ${NADIR[k.nadir][0]}</span>${o.tahmin != null ? `<span class="k-tah" title="Tahmini toplam (rakip kartı bilinmeden)">≈${o.tahmin}</span>` : ''}</div>
+    <p class="k-yt"><b>${k.ytAd}</b> · ${YT[k.yt]}</p>
+    <div class="k-st">${stats}</div>
+  </article>`;
+}
+const arkaHTML = () => `<div class="arka" aria-label="Kapalı kart">${IKON.efsane}</div>`;
+const cipHTML = boy => `<span class="cip" data-boy="${boy}">${IKON[boy]}${boy === 'efsane' ? 'Efsane' : BOYLAR[boy].ad}</span>`;
+
+function kurallarHTML() {
+  return `<section class="kurallar">
+    <div>
+      <h2>Nasıl oynanır</h2>
+      <ol>
+        <li>24 kart karılır, her Kam'a 12 kart dağıtılır. Elinde hep 5 kart tutarsın, gerisi destende bekler.</li>
+        <li>Her tur sırayla bir Kam saldırır. Saldıran, elindeki bir kartın bir özelliğini seçer: düello o özellikle yapılır.</li>
+        <li>Savunan, düellonun hangi özellikle yapılacağını görür ama saldıranın kartını görmez. Elinden bir kart sürer.</li>
+        <li>Kartlar açılır. <b>Toplam = özellik + boy üstünlüğü (+10) + arena (+6) + yetenek + tılsım (+15).</b> Yüksek toplam kazanır. Eşitlikte önce Kalkan, sonra yüksek Hız kazanır.</li>
+        <li>Kazanan, rakibin kartını ele geçirip destesinin altına koyar. Kaybeden kartın Dayanıklılığı, kazananın Gücünü 20 ya da daha fazla geçiyorsa kart kaçar ve sahibine döner.</li>
+        <li>Kartı biten Kam kaybeder. 16 tur sonunda en çok kartı olan Kam kazanır.</li>
+      </ol>
+    </div>
+    <div>
+      <h2>Boy döngüsü</h2>
+      <ul class="dongu">
+        <li>${cipHTML('su')} söndürür ${cipHTML('od')}</li>
+        <li>${cipHTML('od')} yakar ${cipHTML('yel')}</li>
+        <li>${cipHTML('yel')} aşındırır ${cipHTML('yer')}</li>
+        <li>${cipHTML('yer')} set çeker ${cipHTML('su')}</li>
+      </ul>
+      <p>Her turun arenası bir boyu (ya da Kaf Dağı Eteği'nde Efsaneleri) +6 ile güçlendirir. Her Kam'ın 2 tılsımı vardır; tılsım kartlar açılana kadar gizli kalır.</p>
+    </div>
+    <div>
+      <h2>Yetenekler</h2>
+      <ul class="ytler">${Object.keys(YT).map(k => `<li><b>${YT_AD[k]}</b> · ${YT[k]}</li>`).join('')}</ul>
+    </div>
+  </section>`;
+}
+
+function girisHTML() {
+  return `<div class="bant"></div>
+  <section class="giris">
+    <div>
+      <p class="ust-yazi">İki Kam için kart düellosu</p>
+      <h1>Kaf Dağı Düellosu</h1>
+      <p class="hikaye">Kaf Dağı'nın ardında, Yedi Kat Gök ile Yedi Kat Yer'in buluştuğu yerde, <em>Hüma Kuşu'nun gölgesi</em> boş bir tahtın üstünde bekler. O tahta, kadim yaratıkları çağırıp düelloda üstün gelen Kam oturur. Evren'in ateşi, Şahmeran'ın zekâsı, Tulpar'ın hızı ve Tepegöz'ün tunç derisi aynı destede. Deste karılacak, kartlar dağıtılacak ve iki Kam'dan yalnızca biri Kaf Dağı'ndan tahtla dönecek.</p>
+      <div class="modlar" role="radiogroup" aria-label="Oyun türü">
+        <label class="mod"><input type="radio" name="mod" id="mod-ai" value="ai" ${ui.mod === 'ai' ? 'checked' : ''}><span><b>Bilgisayara karşı</b><small>Kara Kam seninle düello eder.</small></span></label>
+        <label class="mod"><input type="radio" name="mod" id="mod-pvp" value="pvp" ${ui.mod === 'pvp' ? 'checked' : ''}><span><b>İki oyuncu, tek cihaz</b><small>Sıra gelince cihazı rakibine ver.</small></span></label>
+      </div>
+      <div class="alanlar">
+        <div class="alan"><label for="ad1">Birinci Kam</label><input id="ad1" maxlength="18" placeholder="Birinci Kam" value="${esc(ui.adlar?.[0] ?? '')}"></div>
+        <div class="alan" id="ad2-alan" ${ui.mod === 'pvp' ? '' : 'hidden'}><label for="ad2">İkinci Kam</label><input id="ad2" maxlength="18" placeholder="İkinci Kam" value="${esc(ui.mod === 'pvp' ? (ui.adlar?.[1] ?? '') : '')}"></div>
+      </div>
+      <button class="btn" data-act="basla">Desteyi karıştır ve dağıt</button>
+    </div>
+    <div class="yelpaze" aria-hidden="true">
+      ${kartHTML(K.sahmeran)}${kartHTML(K.evren, {vurgu:'guc'})}${kartHTML(K.tulpar)}
+    </div>
+  </section>
+  ${kurallarHTML()}`;
+}
+
+function altIndex() {
+  if (S.mod === 'ai') return 0;
+  if (S.faz === 'savunma') return 1 - S.saldiran;
+  return S.saldiran;
+}
+
+function seritHTML(o, i) {
+  const aktif = (S.faz === 'saldiri' && i === S.saldiran) || (S.faz === 'savunma' && i !== S.saldiran);
+  const rol = i === S.saldiran ? 'Saldıran' : 'Savunan';
+  const tl = '●'.repeat(o.tilsim) + `<span class="bos">${'●'.repeat(2 - o.tilsim)}</span>`;
+  return `<div class="serit">
+    <div class="serit-ad"><h2>${esc(o.ad)}</h2><span class="rozet${aktif ? ' aktif' : ''}">${rol}</span></div>
+    <div class="sayilar">
+      <span>El <b>${o.el.length}</b></span><span>Deste <b>${o.deste.length}</b></span>
+      <span title="Kalan tılsım">Tılsım <span class="tilsimlar">${tl}</span></span>
+      <span class="toplam">Kart <b>${kartSay(o)}</b></span>
+    </div>
+  </div>`;
+}
+
+function acikSlot(rolAd, o, kart, h, durum) {
+  const satir = h.r.map(([ad, v], i) => `<tr class="${v < 0 ? 'eksi' : ''}"><td>${esc(ad)}</td><td>${i > 0 && v > 0 ? '+' : ''}${v}</td></tr>`).join('');
+  return `<div class="slot ${durum}">
+    <div class="slot-etiket">${rolAd} · ${esc(o.ad)}</div>
+    ${kartHTML(kart, {vurgu: S.sonuc.stat, acil: true})}
+    <table class="dokum"><tbody>${satir}<tr class="top"><td>Toplam</td><td>${h.t}</td></tr></tbody></table>
+  </div>`;
+}
+
+function duelloHTML() {
+  const si = S.saldiran, vi = 1 - si, sa = S.oyuncular[si], sv = S.oyuncular[vi];
+  const st = S.sec.stat ? STAT_AD[S.sec.stat] : '—';
+  const orta = `<div class="orta"><small>Düello</small><b>${st}</b><span>${esc(S.arena.ad)}</span></div>`;
+  if (S.faz === 'acilis' || (S.faz === 'son' && S.sonuc)) {
+    const r = S.sonuc;
+    const d = i => r.w === null ? '' : (r.w === i ? 'kazandi' : 'kaybetti');
+    const baslik = r.w === null ? 'Berabere' : `${esc(S.oyuncular[r.w].ad)} kazandı`;
+    return `<section class="duello" aria-live="polite">
+      ${acikSlot('Saldıran', sa, K[r.ka], r.A, d(si))}${orta}${acikSlot('Savunan', sv, K[r.kv], r.V, d(vi))}
+      <div class="hukum"><h3>${baslik}</h3><p class="neden">${esc(r.neden)}</p><p>${esc(r.not)}</p></div>
+    </section>`;
+  }
+  const sol = S.faz === 'savunma'
+    ? arkaHTML()
+    : `<div class="slot-bos">${S.sec.kart ? `${K[S.sec.kart].ad} · ${st}<br>Onaylamak için Saldır'a bas.` : 'Elinden bir kartın bir özelliğine dokun.'}</div>`;
+  const sag = `<div class="slot-bos">${S.faz === 'savunma'
+    ? (S.sav.kart ? `${K[S.sav.kart].ad}<br>Onaylamak için Savun'a bas.` : 'Savunacak kartı seç.')
+    : `${esc(sv.ad)} savunmayı bekliyor.`}</div>`;
+  return `<section class="duello">
+    <div class="slot"><div class="slot-etiket">Saldıran · ${esc(sa.ad)}</div>${sol}</div>
+    ${orta}
+    <div class="slot"><div class="slot-etiket">Savunan · ${esc(sv.ad)}</div>${sag}</div>
+  </section>`;
+}
+
+function elHTML(o, i) {
+  const acik = S.mod === 'ai' ? i === 0 : (S.kapi == null && (S.faz === 'saldiri' || S.faz === 'savunma'));
+  if (!acik) return `<div class="el-gizli"><div class="minis">${o.el.map(() => '<span class="mini"></span>').join('')}</div>Kartlar gizli</div>`;
+  const kartlar = o.el.map(id => {
+    const k = K[id];
+    if (S.faz === 'saldiri' && i === S.saldiran) {
+      const sec = S.sec.kart === id;
+      return kartHTML(k, {statSec: true, secili: sec, vurgu: sec ? S.sec.stat : null,
+        tahmin: sec && S.sec.stat ? hesapla(k, null, S.sec.stat, 'saldiri', o, S.sec.tilsim).t : null});
+    }
+    if (S.faz === 'savunma' && i !== S.saldiran) {
+      const sec = S.sav.kart === id;
+      return kartHTML(k, {tik: true, secili: sec, vurgu: S.sec.stat,
+        tahmin: hesapla(k, null, S.sec.stat, 'savunma', o, sec && S.sav.tilsim).t});
+    }
+    return kartHTML(k);
+  }).join('');
+  return `<div class="el" id="el">${kartlar}</div>`;
+}
+
+function durumHTML(i) {
+  const sa = S.oyuncular[S.saldiran];
+  if (S.faz === 'saldiri' && i === S.saldiran)
+    return `<p class="durum">Saldırı sırası sende. Bir kartın <b>özelliğine</b> dokun: düello o özellikle yapılır. Arena: <b>${esc(S.arena.ad)}</b>, ${S.arena.aciklama}.</p>`;
+  if (S.faz === 'savunma' && i !== S.saldiran)
+    return `<p class="durum"><b>${esc(sa.ad)}</b> bir <b>${STAT_AD[S.sec.stat]}</b> düellosu açtı. Kartını görmüyorsun; savunacak kartını seç.</p>`;
+  return '';
+}
+
+function eylemHTML() {
+  if (S.faz === 'acilis') {
+    const son = S.tur >= S.maxTur || S.oyuncular.some(o => kartSay(o) === 0);
+    return `<div class="eylem"><span class="ozet">Tur <b>${S.tur}</b> bitti.</span><div class="dugmeler"><button class="btn" data-act="devam">${son ? 'Sonucu gör' : 'Sonraki tur'}</button></div></div>`;
+  }
+  if (S.faz !== 'saldiri' && S.faz !== 'savunma') return '';
+  const saldiri = S.faz === 'saldiri';
+  const o = S.oyuncular[saldiri ? S.saldiran : 1 - S.saldiran];
+  const x = saldiri ? S.sec : S.sav;
+  const hazir = saldiri ? (x.kart && x.stat) : x.kart;
+  let ozet = saldiri ? 'Henüz kart seçmedin.' : 'Henüz savunma kartı seçmedin.';
+  if (hazir) {
+    const t = hesapla(K[x.kart], null, S.sec.stat, saldiri ? 'saldiri' : 'savunma', o, x.tilsim).t;
+    ozet = `<b>${K[x.kart].ad}</b> · ${STAT_AD[S.sec.stat]} · tahmini <b>${t}</b> <small>(boy üstünlüğü ve lanet kartlar açılınca eklenir)</small>`;
+  }
+  return `<div class="eylem">
+    <span class="ozet">${ozet}</span>
+    <div class="dugmeler">
+      <button class="btn ikincil tilsim-btn" data-act="tilsim" id="tilsim" aria-pressed="${x.tilsim}" ${o.tilsim === 0 && !x.tilsim ? 'disabled' : ''}>Tılsım +15 · ${o.tilsim} kaldı</button>
+      <button class="btn" data-act="${saldiri ? 'saldir' : 'savun'}" ${hazir ? '' : 'disabled'}>${saldiri ? 'Saldır' : 'Savun'}</button>
+    </div>
+  </div>`;
+}
+
+function defterHTML() {
+  const li = S.log.map(l => `<li>
+    <span class="log-tur">Tur ${l.tur} · ${l.stat}</span>
+    <span>${l.a} <b>${l.at}</b> – <b>${l.vt}</b> ${l.v}</span>
+    <span class="log-not">${l.kazanan ? esc(l.kazanan) + ' kazandı. ' : ''}${esc(l.not)}</span>
+  </li>`).join('');
+  return `<aside class="defter">
+    <h2>Düello Defteri</h2>
+    ${li ? `<ol>${li}</ol>` : '<p class="bos">Henüz düello yok. İlk kartlar açıldığında sonuçlar burada görünür.</p>'}
+    <details><summary>Kısa kurallar</summary><ul>
+      <li>Toplam = özellik + boy (+10) + arena (+6) + yetenek + tılsım (+15)</li>
+      <li>Su › Od › Yel › Yer › Su</li>
+      <li>Eşitlikte Kalkan, sonra Hız kazanır.</li>
+      <li>Kaybeden kartın Dayanıklılığı kazananın Gücünü 20+ geçerse kart kaçar.</li>
+      <li>Kartı biten kaybeder; 16 turda en çok kartı olan kazanır.</li>
+    </ul></details>
+  </aside>`;
+}
+
+function kapiHTML() {
+  const o = S.oyuncular[S.kapi];
+  const is = S.faz === 'saldiri' ? 'Saldırı sırası sende.' : `${esc(S.oyuncular[S.saldiran].ad)} bir ${STAT_AD[S.sec.stat]} düellosu açtı. Savunma sırası sende.`;
+  return `<div class="perde opak" role="dialog" aria-modal="true" aria-label="Sıra değişimi"><div class="perde-kutu">
+    ${arkaHTML()}
+    <h2>${esc(o.ad)}, sıra sende</h2>
+    <p>${is}</p>
+    <p class="soluk">Cihazı al; rakibin ekrana bakmasın. Hazır olunca elini aç.</p>
+    <button class="btn" data-act="kapi" id="kapi-btn">Elimi aç</button>
+  </div></div>`;
+}
+
+function sonHTML() {
+  const say = S.oyuncular.map(kartSay);
+  const w = say[0] === say[1] ? null : (say[0] > say[1] ? 0 : 1);
+  const neden = say.includes(0) ? 'Bir Kam\'ın kartı kalmadı.' : `${S.maxTur} tur doldu.`;
+  const baslik = w === null ? 'Taht boş kaldı' : `${esc(S.oyuncular[w].ad)} tahta oturdu`;
+  const alt = w === null ? 'İki Kam eşit sayıda kartla ayrıldı. Hüma Kuşu bir sonraki düelloyu bekliyor.' : `Hüma Kuşu'nun gölgesi ${esc(S.oyuncular[w].ad)} üstüne düştü.`;
+  return `<div class="perde" role="dialog" aria-modal="true" aria-label="Oyun sonu"><div class="perde-kutu">
+    <h2>${baslik}</h2>
+    <p>${alt}</p>
+    <div class="skor">${S.oyuncular.map((o, i) => `<div><b>${say[i]}</b><span>${esc(o.ad)}</span></div>`).join('')}</div>
+    <p class="soluk">${neden}</p>
+    <div class="dugmeler"><button class="btn" data-act="yeniden" id="yeniden-btn">Yeniden oyna</button><button class="btn ikincil" data-act="menu">Ana menü</button></div>
+  </div></div>`;
+}
+
+function oyunHTML() {
+  const alt = altIndex(), ust = 1 - alt;
+  const A = S.oyuncular[alt], U = S.oyuncular[ust];
+  const cikis = ui.cikis
+    ? `<span class="cikis">Oyun bitsin mi? <button class="btn kucuk" data-act="menu">Evet</button><button class="btn ikincil kucuk" data-act="cikisSor">Vazgeç</button></span>`
+    : `<span class="cikis"><button class="btn ikincil kucuk" data-act="cikisSor">Ana menü</button></span>`;
+  return `<div class="bant"></div>
+  <div class="oyun" style="margin-top:14px">
+    <main class="masa">
+      <header class="ust-bar">
+        <span class="marka">Kaf Dağı Düellosu</span>
+        <span class="tur">Tur <b>${S.tur}</b> / ${S.maxTur}</span>
+        <span class="arena" data-boy="${S.arena.boy}">${IKON[S.arena.boy]}<div><b>${esc(S.arena.ad)}</b><small>${S.arena.aciklama}</small></div></span>
+        ${cikis}
+      </header>
+      ${seritHTML(U, ust)}
+      <div class="el-gizli"><div class="minis">${U.el.map(() => '<span class="mini"></span>').join('')}</div>${U.ai ? 'Kara Kam\'ın eli' : 'Rakibin eli'}</div>
+      ${duelloHTML()}
+      ${seritHTML(A, alt)}
+      ${durumHTML(alt)}
+      ${elHTML(A, alt)}
+      ${eylemHTML()}
+    </main>
+    ${defterHTML()}
+  </div>`;
+}
+
+function ciz() {
+  const eskiEl = document.getElementById('el');
+  const kaydir = eskiEl ? eskiEl.scrollLeft : 0;
+  if (!S) $app.innerHTML = girisHTML();
+  else $app.innerHTML = oyunHTML() + (S.kapi != null ? kapiHTML() : '') + (S.faz === 'son' ? sonHTML() : '');
+  const yeniEl = document.getElementById('el');
+  if (yeniEl) yeniEl.scrollLeft = kaydir;
+  let hedef = ui.odak && $app.querySelector(ui.odak);
+  if (!hedef && S && S.kapi != null) hedef = document.getElementById('kapi-btn');
+  if (!hedef && S && S.faz === 'son') hedef = document.getElementById('yeniden-btn');
+  if (hedef) hedef.focus({preventScroll: true});
+  ui.odak = null;
+}
+
+const deger = id => (document.getElementById(id)?.value || '').trim();
+
+function eylem(a, t) {
+  switch (a) {
+    case 'basla': {
+      const ad1 = deger('ad1') || 'Birinci Kam';
+      const ad2 = ui.mod === 'pvp' ? (deger('ad2') || 'İkinci Kam') : 'Kara Kam';
+      ui.adlar = [ad1, ad2];
+      yeniOyun(ui.mod, ad1, ad2);
+      break;
+    }
+    case 'stat':
+      if (S.faz !== 'saldiri') return;
+      S.sec.kart = t.dataset.id; S.sec.stat = t.dataset.stat;
+      ui.odak = `[data-act="stat"][data-id="${t.dataset.id}"][data-stat="${t.dataset.stat}"]`;
+      ciz(); break;
+    case 'kart':
+      if (S.faz !== 'savunma') return;
+      S.sav.kart = t.dataset.id;
+      ui.odak = `[data-act="kart"][data-id="${t.dataset.id}"]`;
+      ciz(); break;
+    case 'tilsim': {
+      const x = S.faz === 'saldiri' ? S.sec : S.sav;
+      x.tilsim = !x.tilsim; ui.odak = '#tilsim'; ciz(); break;
+    }
+    case 'saldir': if (S.sec.kart && S.sec.stat) saldiriOnayla(); break;
+    case 'savun': if (S.sav.kart) savunmaOnayla(); break;
+    case 'devam': sonrakiTur(); window.scrollTo({top: 0, behavior: 'smooth'}); break;
+    case 'kapi': S.kapi = null; ciz(); break;
+    case 'yeniden': yeniOyun(S.mod, S.oyuncular[0].ad, S.oyuncular[1].ad); break;
+    case 'menu': S = null; ui.cikis = false; ciz(); break;
+    case 'cikisSor': ui.cikis = !ui.cikis; ciz(); break;
+  }
+}
+
+$app.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (t && !t.disabled) eylem(t.dataset.act, t);
+});
+$app.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act]')) {
+    e.preventDefault(); eylem(e.target.dataset.act, e.target);
+  }
+  if (e.key === 'Enter' && e.target.matches('#ad1, #ad2')) eylem('basla');
+});
+$app.addEventListener('change', e => {
+  if (e.target.name === 'mod') {
+    ui.mod = e.target.value;
+    const f = document.getElementById('ad2-alan');
+    if (f) f.hidden = ui.mod !== 'pvp';
+  }
+});
+
+try { window.claude?.hot?.snapshot?.(() => ({S, ui})); } catch (e) {}
+const baslat = d => {
+  if (d && d.S) S = d.S;
+  if (d && d.ui) ui = Object.assign(ui, d.ui);
+  ciz();
+};
+window.claude?.hot?.ready ? window.claude.hot.ready(baslat) : baslat(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</html>
