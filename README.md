@@ -4,7 +4,7 @@ Türk ve Anadolu mitolojisinden yaratıklarla oynanan iki kişilik kart düellos
 
 Kaf Dağı'nın ardında, Hüma Kuşu'nun gölgesinin düştüğü boş bir taht var. İki Kam (şaman), kadim yaratıkları çağırıp bu taht için düello ediyor.
 
-**Oyna:** https://antonybo056.github.io/antonybo056/
+**Oyna:** https://antonybo056.github.io/kaf-dagi-duellosu/
 
 Ya da `index.html` dosyasını indirip tarayıcıda aç.
 
