@@ -24,7 +24,7 @@ Ya da `index.html` dosyasını indirip tarayıcıda aç.
 3. Savunan özelliği görür ama saldıranın kartını görmez; elinden bir kart sürer.
 4. **Toplam = özellik + boy üstünlüğü (+10) + arena (+6) + yetenek + tılsım (+15).** Eşitlikte önce Kalkan, sonra yüksek Hız kazanır.
 5. Kazanan, rakibin kartını ele geçirir. Kaybeden kartın Dayanıklılığı kazananın Gücünü 20 ya da daha fazla geçerse kart kaçar.
-6. Kartı biten kaybeder. 16 tur sonunda en çok kartı olan kazanır.
+6. Kartı biten kaybeder. Tur sayısını oyundan önce sen seçersin (3–30, varsayılan 10); son tur bittiğinde en çok kartı olan kazanır.
 
 Boy döngüsü: Su söndürür Od'u, Od yakar Yel'i, Yel aşındırır Yer'i, Yer set çeker Su'ya.
 

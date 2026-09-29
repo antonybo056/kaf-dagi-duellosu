@@ -109,6 +109,7 @@ button.st:hover{background:var(--kagit-2)}
 .alan label{font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--soluk); font-weight:700}
 .alan input{font:inherit; background:var(--zemin-2); color:var(--metin); border:1px solid var(--cizgi); border-radius:8px; padding:9px 12px}
 .alan input:focus{border-color:var(--altin)}
+.alan.dar{flex:0 1 110px}
 .yelpaze{display:flex; justify-content:center; padding-block:20px}
 .yelpaze .kart:nth-child(1){transform:rotate(-9deg) translateY(16px); margin-right:-44px}
 .yelpaze .kart:nth-child(2){z-index:2}
@@ -313,7 +314,8 @@ const IKON = {
 
 const $app = document.getElementById('app');
 let S = null;
-let ui = {mod:'ai', cikis:false, odak:null};
+let ui = {mod:'ai', cikis:false, odak:null, maxTur:10};
+const TUR_MIN = 3, TUR_MAX = 30;
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rast = a => a[Math.floor(Math.random() * a.length)];
@@ -337,11 +339,11 @@ function hesapla(kart, rakip, stat, rol, o, tilsim) {
   return {r, t: r.reduce((s, x) => s + x[1], 0)};
 }
 
-function yeniOyun(mod, ad1, ad2) {
+function yeniOyun(mod, ad1, ad2, maxTur) {
   const d = karistir(KARTLAR.map(k => k.id));
   const oy = (ad, ai, ids) => ({ad, ai, el: ids.slice(0, 5), deste: ids.slice(5), tilsim: 2});
   S = {
-    mod, tur: 0, maxTur: 16,
+    mod, tur: 0, maxTur,
     oyuncular: [oy(ad1, false, d.slice(0, 12)), oy(ad2, mod === 'ai', d.slice(12))],
     saldiran: Math.random() < .5 ? 0 : 1,
     arena: null, faz: '', sec: null, sav: null, sonuc: null, kapi: null, log: []
@@ -481,7 +483,7 @@ function kurallarHTML() {
         <li>Savunan, düellonun hangi özellikle yapılacağını görür ama saldıranın kartını görmez. Elinden bir kart sürer.</li>
         <li>Kartlar açılır. <b>Toplam = özellik + boy üstünlüğü (+10) + arena (+6) + yetenek + tılsım (+15).</b> Yüksek toplam kazanır. Eşitlikte önce Kalkan, sonra yüksek Hız kazanır.</li>
         <li>Kazanan, rakibin kartını ele geçirip destesinin altına koyar. Kaybeden kartın Dayanıklılığı, kazananın Gücünü 20 ya da daha fazla geçiyorsa kart kaçar ve sahibine döner.</li>
-        <li>Kartı biten Kam kaybeder. 16 tur sonunda en çok kartı olan Kam kazanır.</li>
+        <li>Kartı biten Kam kaybeder. Tur sayısını oyundan önce sen seçersin; son tur bittiğinde en çok kartı olan Kam kazanır.</li>
       </ol>
     </div>
     <div>
@@ -514,6 +516,7 @@ function girisHTML() {
       </div>
       <div class="alanlar">
         <div class="alan"><label for="ad1">Birinci Kam</label><input id="ad1" maxlength="18" placeholder="Birinci Kam" value="${esc(ui.adlar?.[0] ?? '')}"></div>
+        <div class="alan dar"><label for="tur-sayisi">Tur sayısı</label><input id="tur-sayisi" type="number" inputmode="numeric" min="${TUR_MIN}" max="${TUR_MAX}" value="${ui.maxTur}"></div>
         <div class="alan" id="ad2-alan" ${ui.mod === 'pvp' ? '' : 'hidden'}><label for="ad2">İkinci Kam</label><input id="ad2" maxlength="18" placeholder="İkinci Kam" value="${esc(ui.mod === 'pvp' ? (ui.adlar?.[1] ?? '') : '')}"></div>
       </div>
       <button class="btn" data-act="basla">Desteyi karıştır ve dağıt</button>
@@ -647,7 +650,7 @@ function defterHTML() {
       <li>Su › Od › Yel › Yer › Su</li>
       <li>Eşitlikte Kalkan, sonra Hız kazanır.</li>
       <li>Kaybeden kartın Dayanıklılığı kazananın Gücünü 20+ geçerse kart kaçar.</li>
-      <li>Kartı biten kaybeder; 16 turda en çok kartı olan kazanır.</li>
+      <li>Kartı biten kaybeder; ${S.maxTur} tur sonunda en çok kartı olan kazanır.</li>
     </ul></details>
   </aside>`;
 }
@@ -727,8 +730,10 @@ function eylem(a, t) {
     case 'basla': {
       const ad1 = deger('ad1') || 'Birinci Kam';
       const ad2 = ui.mod === 'pvp' ? (deger('ad2') || 'İkinci Kam') : 'Kara Kam';
+      const tur = parseInt(deger('tur-sayisi'), 10);
+      ui.maxTur = Math.min(TUR_MAX, Math.max(TUR_MIN, Number.isFinite(tur) ? tur : 10));
       ui.adlar = [ad1, ad2];
-      yeniOyun(ui.mod, ad1, ad2);
+      yeniOyun(ui.mod, ad1, ad2, ui.maxTur);
       break;
     }
     case 'stat':
@@ -749,7 +754,7 @@ function eylem(a, t) {
     case 'savun': if (S.sav.kart) savunmaOnayla(); break;
     case 'devam': sonrakiTur(); window.scrollTo({top: 0, behavior: 'smooth'}); break;
     case 'kapi': S.kapi = null; ciz(); break;
-    case 'yeniden': yeniOyun(S.mod, S.oyuncular[0].ad, S.oyuncular[1].ad); break;
+    case 'yeniden': yeniOyun(S.mod, S.oyuncular[0].ad, S.oyuncular[1].ad, S.maxTur); break;
     case 'menu': S = null; ui.cikis = false; ciz(); break;
     case 'cikisSor': ui.cikis = !ui.cikis; ciz(); break;
   }
@@ -763,7 +768,7 @@ $app.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act]')) {
     e.preventDefault(); eylem(e.target.dataset.act, e.target);
   }
-  if (e.key === 'Enter' && e.target.matches('#ad1, #ad2')) eylem('basla');
+  if (e.key === 'Enter' && e.target.matches('#ad1, #ad2, #tur-sayisi')) eylem('basla');
 });
 $app.addEventListener('change', e => {
   if (e.target.name === 'mod') {
